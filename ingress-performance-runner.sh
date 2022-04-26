@@ -8,6 +8,8 @@ LOG_DIR=./logs
 RUNNER_LOG=${LOG_DIR}/runner-$(date +"%Y_%m_%d_%I_%M_%p")
 mkdir -p $LOG_DIR
 
+ROUTER_PERF_DIR=./e2e-benchmarking/workloads/router-perf-v2
+
 function log() {
   echo "$@"
   echo "$@" >> $RUNNER_LOG
@@ -45,7 +47,7 @@ function run() {
     TEST_LOG=${TEST_LOG_DIR}/log-${ATTEMPT}
     start=$(date +%s)
     log "Starting test attempt #${ATTEMPT} at $(date)"
-    ./e2e-benchmarking/workloads/router-perf-v2/ingress-performance.sh &> $TEST_LOG
+    ${ROUTER_PERF_DIR}/ingress-performance.sh &> $TEST_LOG
     end=$(date +%s)
     runtime=$((end-start))
     hours=$((runtime / 3600)); minutes=$(( (runtime % 3600) / 60 )); seconds=$(( (runtime % 3600) % 60 ));
@@ -77,12 +79,8 @@ fi
 
 # Checkout e2e-benchmarking, the perf&scale repo
 # Comment this out if you want to modify e2e-benchmarking temporarily
-git submodule update --recursive
-if [[ $? -ne 0 ]]; then
-  log "ERROR: Failed to update e2e-benchmarking"
-  exit 1
-fi
-source ./e2e-benchmarking/workloads/router-perf-v2/env.sh
+git submodule update --recursive --init || exit 1
+source ${ROUTER_PERF_DIR}/env.sh
 
 if [[ -f ${COMPARISON_OUTPUT} ]]; then
   log "ERROR: Refusing to start because ${COMPARISON_OUTPUT} already exists"
