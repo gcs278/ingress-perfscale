@@ -67,8 +67,12 @@ function run() {
 }
 
 if [ -t 1 ] ; then
-  log "ERROR: You need to run this script with nohup for stablity"
-  exit 1 
+  echo "It is HIGHLY recommend you run this script with nohup"
+  echo "nohup $0 &"
+  read -p "Are you sure you want to continue [y/N]" -n 1 -r
+  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    exit 1
+  fi
 fi
 
 # Checkout e2e-benchmarking, the perf&scale repo
