@@ -1,6 +1,5 @@
 #!/bin/bash
 
-source ./env.sh
 alias python=python3
 
 trap "pkill -P $$" EXIT
@@ -71,11 +70,6 @@ if [ -t 1 ] ; then
   exit 1 
 fi
 
-if [[ -f ${COMPARISON_OUTPUT} ]]; then
-  log "ERROR: Refusing to start because ${COMPARISON_OUTPUT} already exists"
-  exit 1
-fi
-
 # Checkout e2e-benchmarking, the perf&scale repo
 # Comment this out if you want to modify e2e-benchmarking temporarily
 git submodule update --recursive
@@ -83,7 +77,13 @@ if [[ $? -ne 0 ]]; then
   log "ERROR: Failed to update e2e-benchmarking"
   exit 1
 fi
+source ./e2e-benchmarking/workloads/router-perf-v2/env.sh
 
-#run "baseline" ./tests/replicas1-baseline.env
+if [[ -f ${COMPARISON_OUTPUT} ]]; then
+  log "ERROR: Refusing to start because ${COMPARISON_OUTPUT} already exists"
+  exit 1
+fi
+
+run ./tests/replicas1-baseline.env
 run ./tests/replicas1-weights-random.env "0f7354c4-1c7e-49a4-a7f3-fa196acfbc8b"
 run ./tests/replicas1-weights.env "0f7354c4-1c7e-49a4-a7f3-fa196acfbc8b"
