@@ -6,6 +6,7 @@ trap "pkill -P $$" EXIT
 
 LOG_DIR=./logs
 RUNNER_LOG=${LOG_DIR}/runner-$(date +"%Y_%m_%d_%I_%M_%p")
+mkdir -p $LOG_DIR
 
 function log() {
   echo "$@"
